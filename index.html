@@ -16,7 +16,7 @@
         <h3>ContentView</h3>
         <p>Create a file called ContentView.swift. This will be the start menu screen of the app. The main outline of the file should look like this:</p>
         <br>
-        <code>
+        <pre><code>
             import SwiftUI
             import SceneKit
 
@@ -29,11 +29,11 @@
                     }
                 }
             }
-        </code>
+        </code></pre>
         <br>
         <p>This sets up our ContentView to have a Navigation Stack so it is able to switch between different views. The next view we'll focus on is the level selection view, so we'll create a new file called LevelViewModel.swift and set is as such:</p>
         <br>
-        <code>
+        <pre><code>
             import SwiftUI
 
             @MainActor
@@ -44,7 +44,7 @@
                 @Published var sceneToDisplay: String = "" // Contains level to display
                 @Published var currentTimer: String = "" // Contains timer based on selected difficulty
             }
-        </code>
+        </code></pre>
         <br>
         <ul>
             <li>showLevel tells us whether we should be showing the selected game level or not.</li>
@@ -56,7 +56,7 @@
         <br>
         <p>We can now create our LevelSelection.swift view:</p>
         <br>
-        <code>
+        <pre><code>
             import SwiftUI
 
             struct LevelSelection: View {
@@ -122,10 +122,10 @@
                     }
                 }
             } 
-        </code>
+        </code></pre>
         <br>
         <p>And our DifficultySettings.swift view:</p>
-        <code>
+        <pre><code>
             import SwiftUI
 
             struct DifficultySettings: View {
@@ -208,7 +208,7 @@
                     }
                 }
              }
-        </code>
+        </code></pre>
         <br>
         <p></p>
     </body>
