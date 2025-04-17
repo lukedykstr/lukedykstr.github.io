@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SceneKit Tutorial</title>
+    </head>
+    <body>
+        <h1>Apple SceneKit Code Tutorial</h1>
+        <h2>Overview</h2>
+        <p>The focus area of this tutorial is SceneKit. SceneKit is a Swift library for creating, managing, and viewing 3D scenes in iOS applications. This tutorial will show you how to implement a 3D puzzle game application using Apple's SceneKit.</p>
+        <p>The game will feature a start screen, level and difficulty select, and a game scene where the user can drag around 3D puzzle pieces into their correct positions, given a certain amount of time depending on the difficulty.</p>
+        <h2>Getting Started</h2>
+        <p>For your development environment, you will need a Mac running the latest XCode version.</p>
+        <p>In XCode, create a new project and select the 'Game' template. Ensure that 'SceneKit' is selected under the 'Game Technology' dropdown menu. This will ensure that the SceneKit dependency and anything else you need will be added to the project.</p>
+        <p>Once the project is created, you can delete the 'art.scnassets' folder with the demo spaceship, and all code within the GameViewController.swift file. You can also delete any storyboard files, as we'll be using SwifUI. You should now have a somewhat empty project with SceneKit all set up and ready to be used.</p>
+        <h2>Coding</h2>
+        <h3>ContentView</h3>
+        <p>Create a file called ContentView.swift. This will be the start menu screen of the app. The main outline of the file should look like this:</p>
+        <br>
+        <code>
+            import SwiftUI
+            import SceneKit
+
+            struct ContentView: View {
+                @State private var path = NavigationPath()
+
+                var body: some View {
+                    NavigationStack(path: $path) {
+
+                    }
+                }
+            }
+        </code>
+        <br>
+        <p>This sets up our ContentView to have a Navigation Stack so it is able to switch between different views. The next view we'll focus on is the level selection view, so we'll create a new file called LevelViewModel.swift and set is as such:</p>
+        <br>
+        <code>
+            import SwiftUI
+
+            @MainActor
+            class LevelViewModel: ObservableObject {
+                @Published var showLevel: Bool = false // Shows level in ContentView
+                @Published var contentViewColor: Color = Color.black // Changes color of ContentView's ZStack
+                @Published var confirmedDifficulty: Bool = false // Difficulty confirmed by user
+                @Published var sceneToDisplay: String = "" // Contains level to display
+                @Published var currentTimer: String = "" // Contains timer based on selected difficulty
+            }
+        </code>
+        <br>
+        <ul>
+            <li>showLevel tells us whether we should be showing the selected game level or not.</li>
+            <li>contentViewColor defines the background color of uor content view.</li>
+            <li>confirmedDifficulty tells us whether the user has selected a difficulty yet or not.</li>
+            <li>sceneToDisplay is the scene file name of the level we want to display.</li>
+            <li>currentTimer is the remaining time the user has to complete the level based on the difficulty.</li>
+        </ul>
+        <br>
+        <p>We can now create our LevelSelection.swift view:</p>
+        <br>
+        <code>
+            import SwiftUI
+
+            struct LevelSelection: View {
+                let view: String
+                @Binding var path: NavigationPath
+                @EnvironmentObject var currentLevel: LevelViewModel
+                @Environment(\.dismiss) private var dismiss
+                
+                let levels: [String] = ["Level 1", "Level 2", "Level 3", "Level 4"];
+                
+                var body: some View {
+                    ZStack{
+                        VStack (spacing: 20){
+                            // Game Title
+                            Text("Select a Level")
+                                .font(.title)
+                                .bold()
+                                .padding([.top], 20)
+                            Spacer()
+                        }
+                        VStack {
+                            ForEach(levels, id:\.self) { level in
+                                Button(level) {
+                                    levelSceneToDisplay(level: level, viewModel: currentLevel)
+                                    path.append("Difficulty")
+                                }
+                                .frame(width: 60)
+                                .padding(.horizontal, 50)
+                                .padding(.vertical, 15)
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                                .padding([.top, .bottom], 20)
+                            }
+                        }
+                    }
+                    .onAppear{
+                        if(currentLevel.confirmedDifficulty){
+                            currentLevel.showLevel = true
+                            path = NavigationPath() // Reset the navigation state
+                        }
+                    }
+                    .containerRelativeFrame([.horizontal, .vertical])
+                    .background(Color.red.opacity(0.6))
+                }
+                
+                func levelSceneToDisplay(level: String, viewModel: LevelViewModel){
+                    switch(level){
+                        case "Level 1":
+                            viewModel.sceneToDisplay = "art.scnassets/level1.scn"
+                            break
+                        case "Level 2":
+                            viewModel.sceneToDisplay = "art.scnassets/level2.scn"
+                            break
+                        case "Level 3":
+                            viewModel.sceneToDisplay = "art.scnassets/level3.scn"
+                            break
+                        case "Level 4":
+                            viewModel.sceneToDisplay = "art.scnassets/level4.scn"
+                            break
+                        default:
+                            break
+                    }
+                }
+            } 
+        </code>
+        <br>
+        <p>And our DifficultySettings.swift view:</p>
+        <code>
+            import SwiftUI
+
+            struct DifficultySettings: View {
+                @EnvironmentObject var currentLevel: LevelViewModel
+                @Environment(\.dismiss) private var dismiss
+                // Creates a difficulty name and color
+                struct DifficultySetting: Identifiable {
+                    var difficulty: String
+                    var color: Color
+                    var id: String { difficulty }
+                 }
+             
+                 // Contains each difficulty and its colors
+                 let difficultyArr: [DifficultySetting] = [
+                 DifficultySetting(difficulty: "Easy", color: Color.green),
+                 DifficultySetting(difficulty: "Medium", color: Color.yellow),
+                 DifficultySetting(difficulty: "Hard", color: Color.red)
+                 ]
+             
+                 var body: some View {
+                     // Display difficulty settings view
+                     if(!currentLevel.confirmedDifficulty){
+                         ZStack{
+                             VStack (spacing: 20){
+                                 // Game Title
+                                 Text("Select a difficulty")
+                                 .font(.title)
+                                 .bold()
+                                 .frame(width: 250)
+                                 .padding(.horizontal, 50)
+                                 .padding(.vertical, 15)
+                                 .background(Color.green)
+                                 .padding([.top], 20)
+                                 Spacer()
+                             }
+                 
+                             VStack {
+                                 // Displays each difficulty
+                                 ForEach(difficultyArr) { setting in
+                                     // Creates a button structure
+                                     VStack {
+                                         Text(setting.difficulty)
+                                         .frame(width: 100)
+                                         .padding(.horizontal, 50)
+                                         .padding(.vertical, 15)
+                                         .background(setting.color)
+                                         .foregroundColor(.white)
+                                         .clipShape(Capsule())
+                                     }.padding([.top, .bottom], 20)
+                                     .simultaneousGesture(TapGesture().onEnded{
+                                         currentLevel.confirmedDifficulty = true
+                                         setDifficultyTimer(difficulty: setting.difficulty)
+                                         dismiss()
+                                     })
+                                }.padding([.bottom], 20)
+                             }
+                        }
+                         .containerRelativeFrame([.horizontal, .vertical])
+                         .background(Color.red.opacity(0.6))
+                    }
+                }
+                
+                
+                func setDifficultyTimer(difficulty: String){
+                    switch(difficulty){
+                        case "Easy":
+                            currentLevel.currentTimer = "2:00"
+                            break
+                            
+                        case "Medium":
+                            currentLevel.currentTimer = "1:30"
+                            break
+                        
+                        case "Hard":
+                        currentLevel.currentTimer = "1:00"
+                            break
+                        
+                        default:
+                            break
+                    }
+                }
+             }
+        </code>
+        <br>
+        <p></p>
+    </body>
+</html>
