@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>SceneKit Tutorial</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <h1>Apple SceneKit Code Tutorial</h1>
@@ -16,35 +17,39 @@
         <h3>ContentView</h3>
         <p>Create a file called ContentView.swift. This will be the start menu screen of the app. The main outline of the file should look like this:</p>
         <br>
-        <pre><code>
-            import SwiftUI
-            import SceneKit
+        <div id="code-block">
+            <pre><code>
+    import SwiftUI
+    import SceneKit
 
-            struct ContentView: View {
-                @State private var path = NavigationPath()
+    struct ContentView: View {
+        @State private var path = NavigationPath()
 
-                var body: some View {
-                    NavigationStack(path: $path) {
+        var body: some View {
+            NavigationStack(path: $path) {
 
-                    }
-                }
             }
-        </code></pre>
+        }
+    }
+            </code></pre>
+        </div>
         <br>
         <p>This sets up our ContentView to have a Navigation Stack so it is able to switch between different views. The next view we'll focus on is the level selection view, so we'll create a new file called LevelViewModel.swift and set is as such:</p>
         <br>
-        <pre><code>
-            import SwiftUI
+        <div id="code-block">
+            <pre><code>
+    import SwiftUI
 
-            @MainActor
-            class LevelViewModel: ObservableObject {
-                @Published var showLevel: Bool = false // Shows level in ContentView
-                @Published var contentViewColor: Color = Color.black // Changes color of ContentView's ZStack
-                @Published var confirmedDifficulty: Bool = false // Difficulty confirmed by user
-                @Published var sceneToDisplay: String = "" // Contains level to display
-                @Published var currentTimer: String = "" // Contains timer based on selected difficulty
-            }
-        </code></pre>
+    @MainActor
+    class LevelViewModel: ObservableObject {
+        @Published var showLevel: Bool = false // Shows level in ContentView
+        @Published var contentViewColor: Color = Color.black // Changes color of ContentView's ZStack
+        @Published var confirmedDifficulty: Bool = false // Difficulty confirmed by user
+        @Published var sceneToDisplay: String = "" // Contains level to display
+        @Published var currentTimer: String = "" // Contains timer based on selected difficulty
+    }
+            </code></pre>
+        </div>
         <br>
         <ul>
             <li>showLevel tells us whether we should be showing the selected game level or not.</li>
@@ -56,224 +61,232 @@
         <br>
         <p>We can now create our LevelSelection.swift view:</p>
         <br>
-        <pre><code>
-            import SwiftUI
+        <div id="code-block">
+            <pre><code>
+    import SwiftUI
 
-            struct LevelSelection: View {
-                let view: String
-                @Binding var path: NavigationPath
-                @EnvironmentObject var currentLevel: LevelViewModel
-                @Environment(\.dismiss) private var dismiss
-                
-                let levels: [String] = ["Level 1", "Level 2", "Level 3", "Level 4"];
-                
-                var body: some View {
-                    ZStack{
-                        VStack (spacing: 20){
-                            // Game Title
-                            Text("Select a Level")
-                                .font(.title)
-                                .bold()
-                                .padding([.top], 20)
-                            Spacer()
-                        }
-                        VStack {
-                            ForEach(levels, id:\.self) { level in
-                                Button(level) {
-                                    levelSceneToDisplay(level: level, viewModel: currentLevel)
-                                    path.append("Difficulty")
-                                }
-                                .frame(width: 60)
-                                .padding(.horizontal, 50)
-                                .padding(.vertical, 15)
-                                .background(Color.green)
-                                .foregroundColor(.white)
-                                .clipShape(Capsule())
-                                .padding([.top, .bottom], 20)
-                            }
-                        }
-                    }
-                    .onAppear{
-                        if(currentLevel.confirmedDifficulty){
-                            currentLevel.showLevel = true
-                            path = NavigationPath() // Reset the navigation state
-                        }
-                    }
-                    .containerRelativeFrame([.horizontal, .vertical])
-                    .background(Color.red.opacity(0.6))
+    struct LevelSelection: View {
+        let view: String
+        @Binding var path: NavigationPath
+        @EnvironmentObject var currentLevel: LevelViewModel
+        @Environment(\.dismiss) private var dismiss
+        
+        let levels: [String] = ["Level 1", "Level 2", "Level 3", "Level 4"];
+        
+        var body: some View {
+            ZStack{
+                VStack (spacing: 20){
+                    // Game Title
+                    Text("Select a Level")
+                        .font(.title)
+                        .bold()
+                        .padding([.top], 20)
+                    Spacer()
                 }
-                
-                func levelSceneToDisplay(level: String, viewModel: LevelViewModel){
-                    switch(level){
-                        case "Level 1":
-                            viewModel.sceneToDisplay = "art.scnassets/level1.scn"
-                            break
-                        case "Level 2":
-                            viewModel.sceneToDisplay = "art.scnassets/level2.scn"
-                            break
-                        case "Level 3":
-                            viewModel.sceneToDisplay = "art.scnassets/level3.scn"
-                            break
-                        case "Level 4":
-                            viewModel.sceneToDisplay = "art.scnassets/level4.scn"
-                            break
-                        default:
-                            break
+                VStack {
+                    ForEach(levels, id:\.self) { level in
+                        Button(level) {
+                            levelSceneToDisplay(level: level, viewModel: currentLevel)
+                            path.append("Difficulty")
+                        }
+                        .frame(width: 60)
+                        .padding(.horizontal, 50)
+                        .padding(.vertical, 15)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                        .padding([.top, .bottom], 20)
                     }
                 }
-            } 
-        </code></pre>
+            }
+            .onAppear{
+                if(currentLevel.confirmedDifficulty){
+                    currentLevel.showLevel = true
+                    path = NavigationPath() // Reset the navigation state
+                }
+            }
+            .containerRelativeFrame([.horizontal, .vertical])
+            .background(Color.red.opacity(0.6))
+        }
+        
+        func levelSceneToDisplay(level: String, viewModel: LevelViewModel){
+            switch(level){
+                case "Level 1":
+                    viewModel.sceneToDisplay = "art.scnassets/level1.scn"
+                    break
+                case "Level 2":
+                    viewModel.sceneToDisplay = "art.scnassets/level2.scn"
+                    break
+                case "Level 3":
+                    viewModel.sceneToDisplay = "art.scnassets/level3.scn"
+                    break
+                case "Level 4":
+                    viewModel.sceneToDisplay = "art.scnassets/level4.scn"
+                    break
+                default:
+                    break
+            }
+        }
+    } 
+            </code></pre>
+        </div>
         <br>
         <p>And our DifficultySettings.swift view:</p>
-        <pre><code>
-            import SwiftUI
+        <div id="code-block">
+            <pre><code>
+    import SwiftUI
 
-            struct DifficultySettings: View {
-                @EnvironmentObject var currentLevel: LevelViewModel
-                @Environment(\.dismiss) private var dismiss
-                // Creates a difficulty name and color
-                struct DifficultySetting: Identifiable {
-                    var difficulty: String
-                    var color: Color
-                    var id: String { difficulty }
-                 }
-             
-                 // Contains each difficulty and its colors
-                 let difficultyArr: [DifficultySetting] = [
-                 DifficultySetting(difficulty: "Easy", color: Color.green),
-                 DifficultySetting(difficulty: "Medium", color: Color.yellow),
-                 DifficultySetting(difficulty: "Hard", color: Color.red)
-                 ]
-             
-                 var body: some View {
-                     // Display difficulty settings view
-                     if(!currentLevel.confirmedDifficulty){
-                         ZStack{
-                             VStack (spacing: 20){
-                                 // Game Title
-                                 Text("Select a difficulty")
-                                 .font(.title)
-                                 .bold()
-                                 .frame(width: 250)
+    struct DifficultySettings: View {
+        @EnvironmentObject var currentLevel: LevelViewModel
+        @Environment(\.dismiss) private var dismiss
+        // Creates a difficulty name and color
+        struct DifficultySetting: Identifiable {
+            var difficulty: String
+            var color: Color
+            var id: String { difficulty }
+         }
+     
+         // Contains each difficulty and its colors
+         let difficultyArr: [DifficultySetting] = [
+         DifficultySetting(difficulty: "Easy", color: Color.green),
+         DifficultySetting(difficulty: "Medium", color: Color.yellow),
+         DifficultySetting(difficulty: "Hard", color: Color.red)
+         ]
+     
+         var body: some View {
+             // Display difficulty settings view
+             if(!currentLevel.confirmedDifficulty){
+                 ZStack{
+                     VStack (spacing: 20){
+                         // Game Title
+                         Text("Select a difficulty")
+                         .font(.title)
+                         .bold()
+                         .frame(width: 250)
+                         .padding(.horizontal, 50)
+                         .padding(.vertical, 15)
+                         .background(Color.green)
+                         .padding([.top], 20)
+                         Spacer()
+                     }
+         
+                     VStack {
+                         // Displays each difficulty
+                         ForEach(difficultyArr) { setting in
+                             // Creates a button structure
+                             VStack {
+                                 Text(setting.difficulty)
+                                 .frame(width: 100)
                                  .padding(.horizontal, 50)
                                  .padding(.vertical, 15)
-                                 .background(Color.green)
-                                 .padding([.top], 20)
-                                 Spacer()
-                             }
-                 
-                             VStack {
-                                 // Displays each difficulty
-                                 ForEach(difficultyArr) { setting in
-                                     // Creates a button structure
-                                     VStack {
-                                         Text(setting.difficulty)
-                                         .frame(width: 100)
-                                         .padding(.horizontal, 50)
-                                         .padding(.vertical, 15)
-                                         .background(setting.color)
-                                         .foregroundColor(.white)
-                                         .clipShape(Capsule())
-                                     }.padding([.top, .bottom], 20)
-                                     .simultaneousGesture(TapGesture().onEnded{
-                                         currentLevel.confirmedDifficulty = true
-                                         setDifficultyTimer(difficulty: setting.difficulty)
-                                         dismiss()
-                                     })
-                                }.padding([.bottom], 20)
-                             }
-                        }
-                         .containerRelativeFrame([.horizontal, .vertical])
-                         .background(Color.red.opacity(0.6))
-                    }
+                                 .background(setting.color)
+                                 .foregroundColor(.white)
+                                 .clipShape(Capsule())
+                             }.padding([.top, .bottom], 20)
+                             .simultaneousGesture(TapGesture().onEnded{
+                                 currentLevel.confirmedDifficulty = true
+                                 setDifficultyTimer(difficulty: setting.difficulty)
+                                 dismiss()
+                             })
+                        }.padding([.bottom], 20)
+                     }
                 }
+                 .containerRelativeFrame([.horizontal, .vertical])
+                 .background(Color.red.opacity(0.6))
+            }
+        }
+        
+        
+        func setDifficultyTimer(difficulty: String){
+            switch(difficulty){
+                case "Easy":
+                    currentLevel.currentTimer = "2:00"
+                    break
+                    
+                case "Medium":
+                    currentLevel.currentTimer = "1:30"
+                    break
                 
+                case "Hard":
+                currentLevel.currentTimer = "1:00"
+                    break
                 
-                func setDifficultyTimer(difficulty: String){
-                    switch(difficulty){
-                        case "Easy":
-                            currentLevel.currentTimer = "2:00"
-                            break
-                            
-                        case "Medium":
-                            currentLevel.currentTimer = "1:30"
-                            break
-                        
-                        case "Hard":
-                        currentLevel.currentTimer = "1:00"
-                            break
-                        
-                        default:
-                            break
-                    }
-                }
-             }
-        </code></pre>
+                default:
+                    break
+            }
+        }
+     }
+            </code></pre>
+        </div>
         <br>
         <p>We now have our level selection and difficulty selection views all set up. We can get started on our GameView, where we will be using SceneKit.</p>
         <p>Rather than using an SCNView directly, the default SceneKit view to display a 3D scene, we will be creating a SceneViewWrapper in order to add more functionality, in this case, tap and drag gesture recognition.</p>
         <p>Here is the outline of the GameView.swift file to get started:</p>
         <br>
-        <pre><code>
-            import SwiftUI
-            import SceneKit
-            
-            struct GameView: View {
-                @EnvironmentObject var level: LevelViewModel
-                
-                var body: some View {
-                    SceneViewWrapper()
-                }
-            }
+        <div id="code-block">
+            <pre><code>
+    import SwiftUI
+    import SceneKit
+    
+    struct GameView: View {
+        @EnvironmentObject var level: LevelViewModel
+        
+        var body: some View {
+            SceneViewWrapper()
+        }
+    }
 
-            struct SceneViewWrapper: UIViewRepresentable {
-                @EnvironmentObject var level: LevelViewModel
-                
-                func makeUIView(context: Context) -> SCNView {
-                    let sceneView = SCNView()
-                    
-                    return sceneView
-                }
-                
-                func updateUIView(_ uiView: SCNView, context: Context) {}
-                
-                func makeCoordinator() -> Coordinator {
-                    Coordinator()
-                }
-                
-                class Coordinator: NSObject {
-                    @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
-                    
-                    }
-                }
+    struct SceneViewWrapper: UIViewRepresentable {
+        @EnvironmentObject var level: LevelViewModel
+        
+        func makeUIView(context: Context) -> SCNView {
+            let sceneView = SCNView()
+            
+            return sceneView
+        }
+        
+        func updateUIView(_ uiView: SCNView, context: Context) {}
+        
+        func makeCoordinator() -> Coordinator {
+            Coordinator()
+        }
+        
+        class Coordinator: NSObject {
+            @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
+            
             }
-        </code></pre>
+        }
+    }
+            </code></pre>
+        </div>
         <br>
         <p>Our main view consists of a SceneViewWrapper, which, right now, just returns a default SCNView and does nothing else.</p>
         <p>In the makeUIView function of the SceneViewWrapper, we can load the scene of the level we want to display and add a gesture recognizer accordingly:</p>
         <br>
-        <pre><code>
-            func makeUIView(context: Context) -> SCNView {
-                let sceneView = SCNView()
-                let scene = SCNScene(named: level.sceneToDisplay)
-                
-                sceneView.scene = scene
-                sceneView.allowsCameraControl = true
-                sceneView.autoenablesDefaultLighting = true
-                sceneView.antialiasingMode = .multisampling4X
-                sceneView.preferredFramesPerSecond = 60
-                
-                let panGesture = UIPanGestureRecognizer(
-                    target: context.coordinator,
-                    action: #selector(Coordinator.handlePan(_:))
-                )
-                
-                sceneView.addGestureRecognizer(panGesture)
-                context.coordinator.sceneView = sceneView
-                
-                return sceneView
-            }
-        </code></pre>
+        <div id="code-block">
+            <pre><code>
+    func makeUIView(context: Context) -> SCNView {
+        let sceneView = SCNView()
+        let scene = SCNScene(named: level.sceneToDisplay)
+        
+        sceneView.scene = scene
+        sceneView.allowsCameraControl = true
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.antialiasingMode = .multisampling4X
+        sceneView.preferredFramesPerSecond = 60
+        
+        let panGesture = UIPanGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handlePan(_:))
+        )
+        
+        sceneView.addGestureRecognizer(panGesture)
+        context.coordinator.sceneView = sceneView
+        
+        return sceneView
+    }
+            </code></pre>
+        </div>
         <br>
         <p>Here, we load the level of the scene we want to display provided from the level view model. We set the sceneView's scene with <code>sceneView.scene = scene</code></p>
         <p>We adjust various settings, such as allowing camera control, enabling default lighting, setting the antialiasing mode, and setting the preferred FPS to 60.</p>
@@ -287,41 +300,43 @@
         <p>The handlePan function will take our pan gesture recognizer as an argument and use <code>sceneView.hitTest()</code> to determine which object the user has tapped on, if any. In this case, we are only looking at objects with the tag "piece". If an object does not have that tag, which can be defined in the SceneKit Scene Editor, then it won't be recognized and cannot be tapped and dragged.</p>
         <p>Here is the Coordinator class in full:</p>
         <br>
-        <pre><code>
-            class Coordinator: NSObject {
-                weak var sceneView: SCNView?
-                var selectedNode: SCNNode?
-                var lastHitPosition: SCNVector3?
+        <div id="code-block">
+            <pre><code>
+    class Coordinator: NSObject {
+        weak var sceneView: SCNView?
+        var selectedNode: SCNNode?
+        var lastHitPosition: SCNVector3?
+        
+        @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
+            guard let sceneView = sceneView else { return }
+            let location = gesture.location(in: sceneView)
+            
+            if gesture.state == .began {
+                let hits = sceneView.hitTest(location, options: nil)
                 
-                @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
-                    guard let sceneView = sceneView else { return }
-                    let location = gesture.location(in: sceneView)
-                    
-                    if gesture.state == .began {
-                        let hits = sceneView.hitTest(location, options: nil)
-                        
-                        if let hit = hits.first(where: { $0.node.name == "piece" }) {
-                            selectedNode = hit.node
-                            lastHitPosition = hit.worldCoordinates
-                        }
-                    } else if gesture.state == .changed {
-                        guard let node = selectedNode, let lastPos = lastHitPosition else { return }
-                        
-                        let hitResults = sceneView.hitTest(
-                            location,
-                            options: [SCNHitTestOption.boundingBoxOnly: true]
-                        )
-                        
-                        if let result = hitResults.first {
-                            let newPos = result.worldCoordinates
-                            node.position = SCNVector3(newPos.x, lastPos.y, newPos.z)
-                        }
-                    } else if gesture.state == .ended {
-                        selectedNode = nil
-                        lastHitPosition = nil
-                    }
+                if let hit = hits.first(where: { $0.node.name == "piece" }) {
+                    selectedNode = hit.node
+                    lastHitPosition = hit.worldCoordinates
                 }
+            } else if gesture.state == .changed {
+                guard let node = selectedNode, let lastPos = lastHitPosition else { return }
+                
+                let hitResults = sceneView.hitTest(
+                    location,
+                    options: [SCNHitTestOption.boundingBoxOnly: true]
+                )
+                
+                if let result = hitResults.first {
+                    let newPos = result.worldCoordinates
+                    node.position = SCNVector3(newPos.x, lastPos.y, newPos.z)
+                }
+            } else if gesture.state == .ended {
+                selectedNode = nil
+                lastHitPosition = nil
             }
-        </code></pre>
+        }
+    }
+            </code></pre>
+        </div>
     </body>
 </html>

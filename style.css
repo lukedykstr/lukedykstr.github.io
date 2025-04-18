@@ -1,0 +1,14 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+p, h1, h2, h3, li {
+    font-family: Arial, Sans-Serif;
+}
+
+#code-block {
+    background-color: #1f212e;
+    border-radius: 8px;
+    overflow-x: scroll;
+}
